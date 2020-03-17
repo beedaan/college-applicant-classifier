@@ -20,6 +20,7 @@ public class Application {
     public ApplicationStatus applicationStatus;
 
     @Builder
+    @SuppressWarnings("unused")
     private static Application create(String firstName, String lastName, State state, int age, double gpa,
                                       double gpaScale, int satScore, int actScore, int felonies) {
         Application application = new Application();

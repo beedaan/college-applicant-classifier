@@ -1,4 +1,4 @@
-package com.builtbybrendan.collegeApplicantClassifier.applicationStatus;
+package com.builtbybrendan.collegeApplicantClassifier.application;
 
 import lombok.Builder;
 import lombok.Data;

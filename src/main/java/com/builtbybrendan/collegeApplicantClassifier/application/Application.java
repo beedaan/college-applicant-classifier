@@ -1,6 +1,5 @@
 package com.builtbybrendan.collegeApplicantClassifier.application;
 
-import com.builtbybrendan.collegeApplicantClassifier.applicationStatus.ApplicationStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

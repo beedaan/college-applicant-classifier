@@ -61,4 +61,56 @@ public class ApplicationValidatorTest {
 
         assertDoesNotThrow(() -> applicationValidator.validate(application));
     }
+
+    @Test
+    void shouldThrowExceptionIfFirstNameIsNull() {
+        Application application = Application.builder()
+                .firstName(null)
+                .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                applicationValidator.validate(application)
+        );
+
+        assertEquals("First Name cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionIfFirstNameIsEmpty() {
+        Application application = Application.builder()
+                .firstName("")
+                .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                applicationValidator.validate(application)
+        );
+
+        assertEquals("First Name cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionIfLastNameIsNull() {
+        Application application = Application.builder()
+                .lastName(null)
+                .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                applicationValidator.validate(application)
+        );
+
+        assertEquals("Last Name cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionIfLastNameIsEmpty() {
+        Application application = Application.builder()
+                .lastName("")
+                .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                applicationValidator.validate(application)
+        );
+
+        assertEquals("Last Name cannot be null or empty", exception.getMessage());
+    }
 }

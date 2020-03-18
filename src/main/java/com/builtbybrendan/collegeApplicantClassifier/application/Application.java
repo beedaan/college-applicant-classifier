@@ -3,6 +3,9 @@ package com.builtbybrendan.collegeApplicantClassifier.application;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Data
 @Builder
 public class Application {
@@ -15,6 +18,6 @@ public class Application {
     public double gpaScale;
     public Integer satScore;
     public Integer actScore;
-    public int felonies;
+    public List<LocalDate> felonyDates;
     public ApplicationStatus applicationStatus;
 }

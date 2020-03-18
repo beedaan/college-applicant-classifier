@@ -8,6 +8,9 @@ import com.builtbybrendan.collegeApplicantClassifier.application.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ApplicationServiceTest {
@@ -27,7 +30,7 @@ public class ApplicationServiceTest {
                 .gpaScale(4.0)
                 .satScore(1920)
                 .actScore(27)
-                .felonies(0)
+                .felonyDates(Collections.emptyList())
                 .build();
     }
 
@@ -38,7 +41,7 @@ public class ApplicationServiceTest {
 
     @Test
     void processApplicationShouldRejectIfMoreThanOneFelony() {
-        application.setFelonies(1);
+        application.setFelonyDates(Collections.singletonList(LocalDate.now()));
 
         ApplicationStatus applicationStatus = applicationService.processApplication(application);
 

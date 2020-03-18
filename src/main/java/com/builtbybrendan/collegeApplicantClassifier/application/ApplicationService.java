@@ -10,6 +10,7 @@ public class ApplicationService {
     private static final int YEARS_OF_ACCEPTABLE_FELONIES = 5;
 
     private ApplicationValidator applicationValidator = new ApplicationValidator();
+    private ApplicationRepository applicationRepository = new DummyApplicationRepositoryImpl();
 
     public ApplicationStatus processApplication(Application application) {
         applicationValidator.validate(application);
@@ -27,6 +28,8 @@ public class ApplicationService {
                     .build();
         }
 
+        application.setApplicationStatus(applicationStatus);
+        applicationRepository.save(application);
         return applicationStatus;
     }
 

@@ -80,8 +80,8 @@ public class ApplicationServiceTest {
         verify(applicationValidator).validate(application);
 
         verify(applicationRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(Classification.FURTHER_REVIEW, applicationArgumentCaptor.getValue().getApplicationStatus().getClassification());
-        assertNull(applicationArgumentCaptor.getValue().getApplicationStatus().getReason());
+        assertEquals(Classification.INSTANT_REJECT, applicationArgumentCaptor.getValue().getApplicationStatus().getClassification());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
     }
 
     @Test

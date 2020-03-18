@@ -11,6 +11,14 @@ public class ApplicationService {
     private static final int YEARS_OF_ACCEPTABLE_FELONIES = 5;
     private static final double UNACCEPTABLE_GPA_PERCENT = 0.7;
 
+    private static final int MINIMUM_ACCEPTABLE_AGE = 17;
+    private static final int MAXIMUM_ACCEPTABLE_AGE = 25;
+    private static final int MINIMUM_ACCEPTABLE_AGE_OUT_OF_STATE = 81;
+    private static final State IN_STATE = State.CALIFORNIA;
+    private static final double MINIMUM_ACCEPTABLE_GPA = 0.9;
+    private static final int MINIMUM_ACCEPTABLE_SAT_SCORE = 1921;
+    private static final int MINIMUM_ACCEPTABLE_ACT_SCORE = 28;
+
     private ApplicationValidator applicationValidator = new ApplicationValidator();
     private ApplicationRepository applicationRepository = new DummyApplicationRepositoryImpl();
 
@@ -20,6 +28,10 @@ public class ApplicationService {
         ApplicationStatus applicationStatus = ApplicationStatus.builder()
                 .classification(Classification.FURTHER_REVIEW)
                 .build();
+
+        if (isApplicantQualifiedForInstantAccept(application)) {
+            applicationStatus.setClassification(Classification.INSTANT_ACCEPT);
+        }
 
         String rejectReason = findInstantRejectReason(application);
 
@@ -87,5 +99,27 @@ public class ApplicationService {
             }
         }
         return false;
+    }
+
+    private boolean isApplicantQualifiedForInstantAccept(Application application) {
+        return doesApplicantMeetAgeRequirements(application)
+                && doesApplicantMeetGpaRequirement(application)
+                && doesApplicantMeetStandardizedTestRequirement(application);
+    }
+
+    private boolean doesApplicantMeetAgeRequirements(Application application) {
+        return (application.getState().equals(IN_STATE)
+                && application.getAge() >= MINIMUM_ACCEPTABLE_AGE
+                && application.getAge() <= MAXIMUM_ACCEPTABLE_AGE) ||
+                application.getAge() >= MINIMUM_ACCEPTABLE_AGE_OUT_OF_STATE;
+    }
+
+    private boolean doesApplicantMeetGpaRequirement(Application application) {
+        return application.getGpa() / application.getGpaScale() >= MINIMUM_ACCEPTABLE_GPA;
+    }
+
+    private boolean doesApplicantMeetStandardizedTestRequirement(Application application) {
+        return application.getSatScore() >= MINIMUM_ACCEPTABLE_SAT_SCORE
+                || application.getActScore() >= MINIMUM_ACCEPTABLE_ACT_SCORE;
     }
 }

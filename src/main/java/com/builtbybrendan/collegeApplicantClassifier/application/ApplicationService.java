@@ -6,10 +6,14 @@ import java.util.stream.Collectors;
 
 public class ApplicationService {
 
-    public static final int ACCEPTABLE_FELONIES = 0;
-    public static final int YEARS_OF_ACCEPTABLE_FELONIES = 5;
+    private static final int ACCEPTABLE_FELONIES = 0;
+    private static final int YEARS_OF_ACCEPTABLE_FELONIES = 5;
+
+    private ApplicationValidator applicationValidator = new ApplicationValidator();
 
     public ApplicationStatus processApplication(Application application) {
+        applicationValidator.validate(application);
+
         ApplicationStatus applicationStatus = ApplicationStatus.builder()
                 .classification(Classification.FURTHER_REVIEW)
                 .build();

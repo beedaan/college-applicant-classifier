@@ -44,6 +44,8 @@ public class ApplicationService {
         } else if (isGpaUnacceptable(application)) {
             DecimalFormat df = new DecimalFormat("#%");
             reason = String.format("Applicant cannot have GPA below %s", df.format(UNACCEPTABLE_GPA_PERCENT));
+        } else if (isAgeUnacceptable(application)) {
+            reason = "Applicant cannot have a negative age";
         }
 
         return reason;
@@ -62,5 +64,9 @@ public class ApplicationService {
     private boolean isGpaUnacceptable(Application application) {
         double gpaPercent = application.getGpa() / application.getGpaScale();
         return gpaPercent < UNACCEPTABLE_GPA_PERCENT;
+    }
+
+    private boolean isAgeUnacceptable(Application application) {
+        return application.getAge() < 0;
     }
 }

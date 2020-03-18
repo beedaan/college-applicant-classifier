@@ -114,4 +114,66 @@ public class ApplicationServiceTest {
         assertEquals(Classification.FURTHER_REVIEW, applicationArgumentCaptor.getValue().getApplicationStatus().getClassification());
         assertNull(applicationArgumentCaptor.getValue().getApplicationStatus().getReason());
     }
+
+    @Test
+    void processApplicationShouldRejectIfGpaBelow70PercentWith4Scale() {
+        application.setGpa(2.7);
+        application.setGpaScale(4.0);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant cannot have GPA below 70%", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldNotRejectIfGpaEqualTo70PercentWith4Scale() {
+        application.setGpa(2.8);
+        application.setGpaScale(4.0);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldRejectIfGpaBelow70PercentWith5Scale() {
+        application.setGpa(3.4);
+        application.setGpaScale(5.0);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant cannot have GPA below 70%", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldNotRejectIfGpaEqualTo70PercentWith5Scale() {
+        application.setGpa(3.5);
+        application.setGpaScale(5.0);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
 }

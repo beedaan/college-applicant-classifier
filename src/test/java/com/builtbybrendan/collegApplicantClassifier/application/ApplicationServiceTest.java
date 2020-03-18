@@ -3,19 +3,29 @@ package com.builtbybrendan.collegApplicantClassifier.application;
 import com.builtbybrendan.collegeApplicantClassifier.application.Application;
 import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationService;
 import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationStatus;
+import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationValidator;
 import com.builtbybrendan.collegeApplicantClassifier.application.Classification;
 import com.builtbybrendan.collegeApplicantClassifier.application.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 public class ApplicationServiceTest {
 
+    @InjectMocks
     ApplicationService applicationService = new ApplicationService();
+    @Spy
+    ApplicationValidator applicationValidator;
 
     Application application;
 
@@ -37,6 +47,8 @@ public class ApplicationServiceTest {
     @Test
     void processApplicationShouldReturnFurtherReviewIfNeitherAcceptNorReject() {
         assertEquals(Classification.FURTHER_REVIEW, applicationService.processApplication(application).getClassification());
+
+        verify(applicationValidator).validate(application);
     }
 
     @Test
@@ -47,5 +59,7 @@ public class ApplicationServiceTest {
 
         assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
         assertEquals("Applicant cannot have 1 or more felonies over the past 5 years", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
     }
 }

@@ -10,18 +10,20 @@ public class ApplicationService {
     public static final int YEARS_OF_ACCEPTABLE_FELONIES = 5;
 
     public ApplicationStatus processApplication(Application application) {
+        ApplicationStatus applicationStatus = ApplicationStatus.builder()
+                .classification(Classification.FURTHER_REVIEW)
+                .build();
+
         String rejectReason = findInstantRejectReason(application);
 
         if (rejectReason != null) {
-            return ApplicationStatus.builder()
+            applicationStatus = ApplicationStatus.builder()
                     .classification(Classification.INSTANT_REJECT)
                     .reason(rejectReason)
                     .build();
         }
 
-        return ApplicationStatus.builder()
-                .classification(Classification.FURTHER_REVIEW)
-                .build();
+        return applicationStatus;
     }
 
     private String findInstantRejectReason(Application application) {

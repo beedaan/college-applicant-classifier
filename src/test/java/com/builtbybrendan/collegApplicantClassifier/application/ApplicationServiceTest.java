@@ -139,6 +139,7 @@ public class ApplicationServiceTest {
         ApplicationStatus applicationStatus = applicationService.processApplication(application);
 
         assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+        assertNull(applicationStatus.getReason());
 
         verify(applicationValidator).validate(application);
 
@@ -170,6 +171,52 @@ public class ApplicationServiceTest {
         ApplicationStatus applicationStatus = applicationService.processApplication(application);
 
         assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+        assertNull(applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldRejectIfAgeIsNegative() {
+        application.setAge(-20);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant cannot have a negative age", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldNotRejectIfAgeZero() {
+        application.setAge(0);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+        assertNull(applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldNotRejectIfAgeIsPositive() {
+        application.setAge(1);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+        assertNull(applicationStatus.getReason());
 
         verify(applicationValidator).validate(application);
 

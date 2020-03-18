@@ -1,11 +1,11 @@
-package com.builtbybrendan.collegeApplicantClassifier.application;
+package com.builtbybrendan.collegeApplicantClassifier.applicant;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class ApplicationStatus {
+public class ApplicantStatus {
 
     public Classification classification;
     public String reason;

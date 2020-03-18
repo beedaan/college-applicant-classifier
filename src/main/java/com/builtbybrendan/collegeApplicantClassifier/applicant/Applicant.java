@@ -1,4 +1,4 @@
-package com.builtbybrendan.collegeApplicantClassifier.application;
+package com.builtbybrendan.collegeApplicantClassifier.applicant;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class Application {
+public class Applicant {
 
     public String firstName;
     public String lastName;
@@ -19,5 +19,5 @@ public class Application {
     public Integer satScore;
     public Integer actScore;
     public List<LocalDate> felonyDates;
-    public ApplicationStatus applicationStatus;
+    public ApplicantStatus applicantStatus;
 }

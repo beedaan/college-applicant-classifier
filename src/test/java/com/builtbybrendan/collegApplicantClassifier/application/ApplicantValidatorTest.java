@@ -1,8 +1,8 @@
 package com.builtbybrendan.collegApplicantClassifier.application;
 
-import com.builtbybrendan.collegeApplicantClassifier.application.Application;
-import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationValidator;
-import com.builtbybrendan.collegeApplicantClassifier.application.State;
+import com.builtbybrendan.collegeApplicantClassifier.applicant.Applicant;
+import com.builtbybrendan.collegeApplicantClassifier.applicant.ApplicantValidator;
+import com.builtbybrendan.collegeApplicantClassifier.applicant.State;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ApplicationValidatorTest {
+public class ApplicantValidatorTest {
 
-    ApplicationValidator applicationValidator = new ApplicationValidator();
+    ApplicantValidator applicantValidator = new ApplicantValidator();
 
     @Test
     void gpaShouldNotBeGreaterThanGpaScale() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .gpa(4.0)
                 .gpaScale(3.0)
                 .satScore(1920)
@@ -25,7 +25,7 @@ public class ApplicationValidatorTest {
                 .build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationValidator.validate(application)
+                applicantValidator.validate(applicant)
         );
 
         assertEquals("GPA cannot be greater than GPA Scale", exception.getMessage());
@@ -33,13 +33,13 @@ public class ApplicationValidatorTest {
 
     @Test
     void shouldHaveBothOrOnlyOneSatScoreOrActScore() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .gpa(3.0)
                 .gpaScale(4.0)
                 .build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationValidator.validate(application)
+                applicantValidator.validate(applicant)
         );
 
         assertEquals("Must contain SAT Score, ACT Score, or both", exception.getMessage());
@@ -47,7 +47,7 @@ public class ApplicationValidatorTest {
 
     @Test
     void shouldNotThrowExceptionIfValid() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .firstName("Joe")
                 .lastName("Smith")
                 .state(State.CALIFORNIA)
@@ -59,18 +59,18 @@ public class ApplicationValidatorTest {
                 .felonyDates(Collections.emptyList())
                 .build();
 
-        assertDoesNotThrow(() -> applicationValidator.validate(application));
+        assertDoesNotThrow(() -> applicantValidator.validate(applicant));
     }
 
     @Test
     void shouldThrowExceptionIfFirstNameIsNull() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .satScore(1920)
                 .firstName(null)
                 .build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationValidator.validate(application)
+                applicantValidator.validate(applicant)
         );
 
         assertEquals("First Name cannot be null or empty", exception.getMessage());
@@ -78,13 +78,13 @@ public class ApplicationValidatorTest {
 
     @Test
     void shouldThrowExceptionIfFirstNameIsEmpty() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .satScore(1920)
                 .firstName("")
                 .build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationValidator.validate(application)
+                applicantValidator.validate(applicant)
         );
 
         assertEquals("First Name cannot be null or empty", exception.getMessage());
@@ -92,14 +92,14 @@ public class ApplicationValidatorTest {
 
     @Test
     void shouldThrowExceptionIfLastNameIsNull() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .satScore(1920)
                 .firstName("Joe")
                 .lastName(null)
                 .build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationValidator.validate(application)
+                applicantValidator.validate(applicant)
         );
 
         assertEquals("Last Name cannot be null or empty", exception.getMessage());
@@ -107,14 +107,14 @@ public class ApplicationValidatorTest {
 
     @Test
     void shouldThrowExceptionIfLastNameIsEmpty() {
-        Application application = Application.builder()
+        Applicant applicant = Applicant.builder()
                 .satScore(1920)
                 .firstName("Joe")
                 .lastName("")
                 .build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationValidator.validate(application)
+                applicantValidator.validate(applicant)
         );
 
         assertEquals("Last Name cannot be null or empty", exception.getMessage());

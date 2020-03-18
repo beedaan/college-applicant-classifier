@@ -283,4 +283,64 @@ public class ApplicationServiceTest {
         verify(applicationRepository).save(applicationArgumentCaptor.capture());
         assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
     }
+
+    @Test
+    void processApplicationShouldRejectIfLastNameDoesNotHaveFirstLetterCapitalized() {
+        application.setLastName("joe");
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant must have a last name with the first letter capitalized, the rest lower case", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldRejectIfLastNameHasNonFirstLetterCapitalized() {
+        application.setLastName("joE");
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant must have a last name with the first letter capitalized, the rest lower case", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldRejectIfLastNameIsAllUppercase() {
+        application.setLastName("JOE");
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant must have a last name with the first letter capitalized, the rest lower case", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
+
+    @Test
+    void processApplicationShouldNotRejectIfLastNameIs1Character() {
+        application.setLastName("J");
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+        assertNull(applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
 }

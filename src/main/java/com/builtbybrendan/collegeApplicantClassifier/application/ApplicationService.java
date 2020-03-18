@@ -48,6 +48,8 @@ public class ApplicationService {
             reason = "Applicant cannot have a negative age";
         } else if (isNameIncorrectlyCapitalized(application.getFirstName())) {
             reason = "Applicant must have a first name with the first letter capitalized, the rest lower case";
+        } else if (isNameIncorrectlyCapitalized(application.getLastName())) {
+            reason = "Applicant must have a last name with the first letter capitalized, the rest lower case";
         }
 
         return reason;

@@ -46,6 +46,8 @@ public class ApplicationService {
             reason = String.format("Applicant cannot have GPA below %s", df.format(UNACCEPTABLE_GPA_PERCENT));
         } else if (isAgeUnacceptable(application)) {
             reason = "Applicant cannot have a negative age";
+        } else if (isNameIncorrectlyCapitalized(application.getFirstName())) {
+            reason = "Applicant must have a first name with the first letter capitalized, the rest lower case";
         }
 
         return reason;
@@ -68,5 +70,20 @@ public class ApplicationService {
 
     private boolean isAgeUnacceptable(Application application) {
         return application.getAge() < 0;
+    }
+
+    private boolean isNameIncorrectlyCapitalized(String name) {
+        char[] nameArr = name.toCharArray();
+
+        if (Character.isLowerCase(nameArr[0])) {
+            return true;
+        }
+
+        for (int i = 1; i < nameArr.length; i++) {
+            if (Character.isUpperCase(nameArr[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 }

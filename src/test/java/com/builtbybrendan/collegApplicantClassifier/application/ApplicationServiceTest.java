@@ -268,4 +268,19 @@ public class ApplicationServiceTest {
         verify(applicationRepository).save(applicationArgumentCaptor.capture());
         assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
     }
+
+    @Test
+    void processApplicationShouldNotRejectIfFirstNameIs1Character() {
+        application.setFirstName("J");
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationStatus.getClassification());
+        assertNull(applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+
+        verify(applicationRepository).save(applicationArgumentCaptor.capture());
+        assertEquals(applicationStatus, applicationArgumentCaptor.getValue().getApplicationStatus());
+    }
 }

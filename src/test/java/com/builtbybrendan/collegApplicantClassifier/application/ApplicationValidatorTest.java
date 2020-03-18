@@ -65,6 +65,7 @@ public class ApplicationValidatorTest {
     @Test
     void shouldThrowExceptionIfFirstNameIsNull() {
         Application application = Application.builder()
+                .satScore(1920)
                 .firstName(null)
                 .build();
 
@@ -78,6 +79,7 @@ public class ApplicationValidatorTest {
     @Test
     void shouldThrowExceptionIfFirstNameIsEmpty() {
         Application application = Application.builder()
+                .satScore(1920)
                 .firstName("")
                 .build();
 
@@ -91,6 +93,8 @@ public class ApplicationValidatorTest {
     @Test
     void shouldThrowExceptionIfLastNameIsNull() {
         Application application = Application.builder()
+                .satScore(1920)
+                .firstName("Joe")
                 .lastName(null)
                 .build();
 
@@ -104,6 +108,8 @@ public class ApplicationValidatorTest {
     @Test
     void shouldThrowExceptionIfLastNameIsEmpty() {
         Application application = Application.builder()
+                .satScore(1920)
+                .firstName("Joe")
                 .lastName("")
                 .build();
 

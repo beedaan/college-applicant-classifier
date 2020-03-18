@@ -2,6 +2,7 @@ package com.builtbybrendan.collegApplicantClassifier.application;
 
 import com.builtbybrendan.collegeApplicantClassifier.application.Application;
 import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationService;
+import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationStatus;
 import com.builtbybrendan.collegeApplicantClassifier.application.Classification;
 import com.builtbybrendan.collegeApplicantClassifier.application.State;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,5 +34,15 @@ public class ApplicationServiceTest {
     @Test
     void processApplicationShouldReturnFurtherReviewIfNeitherAcceptNorReject() {
         assertEquals(Classification.FURTHER_REVIEW, applicationService.processApplication(application).getClassification());
+    }
+
+    @Test
+    void processApplicationShouldRejectIfMoreThanOneFelony() {
+        application.setFelonies(1);
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant cannot have 1 or more felonies over the past 5 years", applicationStatus.getReason());
     }
 }

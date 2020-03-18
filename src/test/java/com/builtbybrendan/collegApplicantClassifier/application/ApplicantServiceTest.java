@@ -54,65 +54,52 @@ public class ApplicantServiceTest {
                 .build();
     }
 
-    @Test
-    void processApplicationShouldReturnFurtherReviewIfNeitherAcceptNorReject() {
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
+    private void processApplicationTestHelper(Applicant applicant, Classification expectedClassification) {
+        processApplicationTestHelper(applicant, expectedClassification, null);
+    }
 
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
+    private void processApplicationTestHelper(Applicant applicant, Classification expectedClassification, String expectedReason) {
+        ApplicantStatus applicantStatus = applicantService.processApplicant(applicant);
 
-        verify(applicantValidator).validate(defaultApplicant);
+        assertEquals(expectedClassification, applicantStatus.getClassification());
+        if (expectedReason != null) {
+            assertEquals(expectedReason, applicantStatus.getReason());
+        } else {
+            assertNull(applicantStatus.getReason());
+        }
+
+        verify(applicantValidator).validate(applicant);
 
         verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(Classification.FURTHER_REVIEW, applicationArgumentCaptor.getValue().getApplicantStatus().getClassification());
-        assertNull(applicationArgumentCaptor.getValue().getApplicantStatus().getReason());
+        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+    }
+
+    @Test
+    void processApplicationShouldReturnFurtherReviewIfNeitherAcceptNorReject() {
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldRejectIfMoreThanOneFelony() {
         defaultApplicant.setFelonyDates(Collections.singletonList(LocalDate.now()));
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant cannot have 1 or more felonies over the past 5 years", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(Classification.INSTANT_REJECT, applicationArgumentCaptor.getValue().getApplicantStatus().getClassification());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have 1 or more felonies over the past 5 years");
     }
 
     @Test
     void processApplicationShouldRejectIfMoreThanOneFelonyLessThan5YearsAgo() {
         defaultApplicant.setFelonyDates(Collections.singletonList(LocalDate.now().minusYears(5).plusDays(1)));
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant cannot have 1 or more felonies over the past 5 years", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have 1 or more felonies over the past 5 years");
     }
 
     @Test
     void processApplicationShouldNotRejectIfNoFeloniesWithin5Years() {
         defaultApplicant.setFelonyDates(Collections.singletonList(LocalDate.now().minusYears(5)));
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(Classification.FURTHER_REVIEW, applicationArgumentCaptor.getValue().getApplicantStatus().getClassification());
-        assertNull(applicationArgumentCaptor.getValue().getApplicantStatus().getReason());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
@@ -120,15 +107,8 @@ public class ApplicantServiceTest {
         defaultApplicant.setGpa(2.7);
         defaultApplicant.setGpaScale(4.0);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant cannot have GPA below 70%", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have GPA below 70%");
     }
 
     @Test
@@ -136,15 +116,7 @@ public class ApplicantServiceTest {
         defaultApplicant.setGpa(2.8);
         defaultApplicant.setGpaScale(4.0);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
@@ -152,15 +124,8 @@ public class ApplicantServiceTest {
         defaultApplicant.setGpa(3.4);
         defaultApplicant.setGpaScale(5.0);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant cannot have GPA below 70%", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have GPA below 70%");
     }
 
     @Test
@@ -168,180 +133,91 @@ public class ApplicantServiceTest {
         defaultApplicant.setGpa(3.5);
         defaultApplicant.setGpaScale(5.0);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldRejectIfAgeIsNegative() {
         defaultApplicant.setAge(-20);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant cannot have a negative age", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have a negative age");
     }
 
     @Test
     void processApplicationShouldNotRejectIfAgeZero() {
         defaultApplicant.setAge(0);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldNotRejectIfAgeIsPositive() {
         defaultApplicant.setAge(1);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldRejectIfFirstNameDoesNotHaveFirstLetterCapitalized() {
         defaultApplicant.setFirstName("joe");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant must have a first name with the first letter capitalized, the rest lower case", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant must have a first name with the first letter capitalized, the rest lower case");
     }
 
     @Test
     void processApplicationShouldRejectIfFirstNameHasNonFirstLetterCapitalized() {
         defaultApplicant.setFirstName("joE");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant must have a first name with the first letter capitalized, the rest lower case", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant must have a first name with the first letter capitalized, the rest lower case");
     }
 
     @Test
     void processApplicationShouldRejectIfFirstNameIsAllUppercase() {
         defaultApplicant.setFirstName("JOE");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant must have a first name with the first letter capitalized, the rest lower case", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant must have a first name with the first letter capitalized, the rest lower case");
     }
 
     @Test
     void processApplicationShouldNotRejectIfFirstNameIs1Character() {
         defaultApplicant.setFirstName("J");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldRejectIfLastNameDoesNotHaveFirstLetterCapitalized() {
-        defaultApplicant.setLastName("joe");
+        defaultApplicant.setLastName("smith");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant must have a last name with the first letter capitalized, the rest lower case", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant must have a last name with the first letter capitalized, the rest lower case");
     }
 
     @Test
     void processApplicationShouldRejectIfLastNameHasNonFirstLetterCapitalized() {
-        defaultApplicant.setLastName("joE");
+        defaultApplicant.setLastName("smIth");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant must have a last name with the first letter capitalized, the rest lower case", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant must have a last name with the first letter capitalized, the rest lower case");
     }
 
     @Test
     void processApplicationShouldRejectIfLastNameIsAllUppercase() {
-        defaultApplicant.setLastName("JOE");
+        defaultApplicant.setLastName("SMITH");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.INSTANT_REJECT, applicantStatus.getClassification());
-        assertEquals("Applicant must have a last name with the first letter capitalized, the rest lower case", applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.INSTANT_REJECT,
+                "Applicant must have a last name with the first letter capitalized, the rest lower case");
     }
 
     @Test
     void processApplicationShouldNotRejectIfLastNameIs1Character() {
-        defaultApplicant.setLastName("J");
+        defaultApplicant.setLastName("S");
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
@@ -349,30 +225,14 @@ public class ApplicantServiceTest {
         defaultApplicant.setState(State.CALIFORNIA);
         defaultApplicant.setAge(17);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldNotApproveIfJustOutOfStateAgeRequirementPasses() {
         defaultApplicant.setAge(81);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
@@ -380,45 +240,21 @@ public class ApplicantServiceTest {
         defaultApplicant.setGpa(3.6);
         defaultApplicant.setGpaScale(4.0);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldNotApproveIfJustSatRequirementPasses() {
         defaultApplicant.setSatScore(1921);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
     void processApplicationShouldNotApproveIfJustActRequirementPasses() {
         defaultApplicant.setActScore(28);
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(defaultApplicant);
-
-        assertEquals(Classification.FURTHER_REVIEW, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(defaultApplicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(defaultApplicant, Classification.FURTHER_REVIEW);
     }
 
     @Test
@@ -434,14 +270,6 @@ public class ApplicantServiceTest {
                 .felonyDates(Collections.emptyList())
                 .build();
 
-        ApplicantStatus applicantStatus = applicantService.processApplicant(applicant);
-
-        assertEquals(Classification.INSTANT_ACCEPT, applicantStatus.getClassification());
-        assertNull(applicantStatus.getReason());
-
-        verify(applicantValidator).validate(applicant);
-
-        verify(applicantRepository).save(applicationArgumentCaptor.capture());
-        assertEquals(applicantStatus, applicationArgumentCaptor.getValue().getApplicantStatus());
+        processApplicationTestHelper(applicant, Classification.INSTANT_ACCEPT);
     }
 }

@@ -46,6 +46,6 @@ public class ApplicationServiceTest {
         ApplicationStatus applicationStatus = applicationService.processApplication(application);
 
         assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
-        assertEquals("Applicant cannot have 1 or more felonies over the past 5 year", applicationStatus.getReason());
+        assertEquals("Applicant cannot have 1 or more felonies over the past 5 years", applicationStatus.getReason());
     }
 }

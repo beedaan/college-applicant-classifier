@@ -5,6 +5,7 @@ import com.builtbybrendan.collegeApplicantClassifier.application.ApplicationVali
 import com.builtbybrendan.collegeApplicantClassifier.application.State;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -56,6 +57,6 @@ public class ApplicationValidatorTest {
                 .felonies(0)
                 .build();
 
-        applicationValidator.validate(application);
+        assertDoesNotThrow(() -> applicationValidator.validate(application));
     }
 }

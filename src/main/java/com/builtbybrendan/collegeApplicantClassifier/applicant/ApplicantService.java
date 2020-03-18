@@ -119,7 +119,7 @@ public class ApplicantService {
     }
 
     private boolean doesApplicantMeetStandardizedTestRequirement(Applicant applicant) {
-        return applicant.getSatScore() >= MINIMUM_ACCEPTABLE_SAT_SCORE
-                || applicant.getActScore() >= MINIMUM_ACCEPTABLE_ACT_SCORE;
+        return (applicant.getSatScore() != null && applicant.getSatScore() >= MINIMUM_ACCEPTABLE_SAT_SCORE)
+                || (applicant.getActScore() != null && applicant.getActScore() >= MINIMUM_ACCEPTABLE_ACT_SCORE);
     }
 }

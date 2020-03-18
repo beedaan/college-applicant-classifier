@@ -272,4 +272,102 @@ public class ApplicantServiceTest {
 
         processApplicationTestHelper(applicant, Classification.INSTANT_ACCEPT);
     }
+
+    @Test
+    void processApplicationShouldApproveIfAllRequirementsPassWithMaximumAge() {
+        Applicant applicant = Applicant.builder()
+                .firstName("Joe")
+                .lastName("Smith")
+                .state(State.CALIFORNIA)
+                .age(25)
+                .gpa(3.6)
+                .gpaScale(4.0)
+                .satScore(1921)
+                .felonyDates(Collections.emptyList())
+                .build();
+
+        processApplicationTestHelper(applicant, Classification.INSTANT_ACCEPT);
+    }
+
+    @Test
+    void processApplicationShouldApproveIfAllRequirementsPassWith5ScaleGpa() {
+        Applicant applicant = Applicant.builder()
+                .firstName("Joe")
+                .lastName("Smith")
+                .state(State.CALIFORNIA)
+                .age(25)
+                .gpa(4.5)
+                .gpaScale(5.0)
+                .satScore(1921)
+                .felonyDates(Collections.emptyList())
+                .build();
+
+        processApplicationTestHelper(applicant, Classification.INSTANT_ACCEPT);
+    }
+
+    @Test
+    void processApplicationShouldApproveIfAllRequirementsPassForOutOfState() {
+        Applicant applicant = Applicant.builder()
+                .firstName("Joe")
+                .lastName("Smith")
+                .state(State.MARYLAND)
+                .age(81)
+                .gpa(3.6)
+                .gpaScale(4.0)
+                .satScore(1921)
+                .felonyDates(Collections.emptyList())
+                .build();
+
+        processApplicationTestHelper(applicant, Classification.INSTANT_ACCEPT);
+    }
+
+    @Test
+    void processApplicationShouldApproveIfAllRequirementsPassWithActScore() {
+        Applicant applicant = Applicant.builder()
+                .firstName("Joe")
+                .lastName("Smith")
+                .state(State.MARYLAND)
+                .age(81)
+                .gpa(3.6)
+                .gpaScale(4.0)
+                .actScore(28)
+                .felonyDates(Collections.emptyList())
+                .build();
+
+        processApplicationTestHelper(applicant, Classification.INSTANT_ACCEPT);
+    }
+
+    @Test
+    void processApplicationShouldRejectAnOtherwisePassingApplicantIfTheyHaveFelonies() {
+        Applicant applicant = Applicant.builder()
+                .firstName("Joe")
+                .lastName("Smith")
+                .state(State.MARYLAND)
+                .age(81)
+                .gpa(3.6)
+                .gpaScale(4.0)
+                .actScore(28)
+                .felonyDates(Collections.singletonList(LocalDate.now()))
+                .build();
+
+        processApplicationTestHelper(applicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have 1 or more felonies over the past 5 years");
+    }
+
+    @Test
+    void processApplicationShouldRejectAnOtherwisePassingApplicantIfTheyHaveUnacceptableGpa() {
+        Applicant applicant = Applicant.builder()
+                .firstName("Joe")
+                .lastName("Smith")
+                .state(State.MARYLAND)
+                .age(81)
+                .gpa(2.7)
+                .gpaScale(4.0)
+                .actScore(28)
+                .felonyDates(Collections.emptyList())
+                .build();
+
+        processApplicationTestHelper(applicant, Classification.INSTANT_REJECT,
+                "Applicant cannot have GPA below 70%");
+    }
 }

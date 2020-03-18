@@ -62,4 +62,25 @@ public class ApplicationServiceTest {
 
         verify(applicationValidator).validate(application);
     }
+
+    @Test
+    void processApplicationShouldRejectIfMoreThanOneFelonyLessThan5YearsAgo() {
+        application.setFelonyDates(Collections.singletonList(LocalDate.now().minusYears(5).plusDays(1)));
+
+        ApplicationStatus applicationStatus = applicationService.processApplication(application);
+
+        assertEquals(Classification.INSTANT_REJECT, applicationStatus.getClassification());
+        assertEquals("Applicant cannot have 1 or more felonies over the past 5 years", applicationStatus.getReason());
+
+        verify(applicationValidator).validate(application);
+    }
+
+    @Test
+    void processApplicationShouldNotRejectIfNoFeloniesWithin5Years() {
+        application.setFelonyDates(Collections.singletonList(LocalDate.now().minusYears(5)));
+
+        assertEquals(Classification.FURTHER_REVIEW, applicationService.processApplication(application).getClassification());
+
+        verify(applicationValidator).validate(application);
+    }
 }

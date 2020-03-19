@@ -48,18 +48,22 @@ An `Applicant` has the following properties
 * felonyDates (List\<LocalDate\>)
 * applicantStatus (ApplicantStatus, nullable)
 
-The applicantStatus is null until the applicant has been processed.  An applicationStatus is assigned to the applicant once they have been processed.
+An applicationStatus is assigned to the applicant once they have been processed.
 
 An `ApplicationStatus` has the following properties
 
-* classification (Classification enum)
+* classification (Classification enum, `INSTANT_ACCEPT`, `INSTANT_REJECT`, `FURTHER_REVIEW`)
 * reason (String, nullable)
 
 Every applicationStatus has a classification.  Only applicationStatuses that have been instantly rejected have a reason.
 
 ## Future Work
 
+### Felony
+
 Right now we just store a list of felonyDates.  It makes sense to create a `Felony` class and store more information about an applicant's felonies.  That way the admissions staff is able to further review the specifics of each felony, in case the Dean changes the amount of acceptable felonies to 2 or so before an instant reject.
+
+### Configuration Properties
 
 Fields stored in the `ApplicationService` control the thresholds for the business logic.  They include:
 
@@ -74,4 +78,15 @@ Fields stored in the `ApplicationService` control the thresholds for the busines
 * `MINIMUM_ACCEPTABLE_SAT_SCORE`
 * `MINIMUM_ACCEPTABLE_ACT_SCORE`
 
-We could enable the configuration of these values with `application.properties` or environment variables so that the end user could tweak these on their own. 
+We could enable the configuration of these values with `application.properties` or environment variables so that the end user could tweak these on their own.
+
+### Applicant Validation
+
+We make a few checks to make sure the applicant is valid, separate from processing the admissions.  This is done with `ApplicantValidator.validate()`.  Right now we check the following:
+
+* The GPA must be less than the GPA Scale
+* The applicant must contain either an SAT Score, an ACT Score, or both.
+* The First Name cannot be null or empty.
+* The Last Name cannot be null or empty.
+
+If any of these checks fail, the application will throw an `IllegalArgumentException`.  We can expand this validation to perform more checks before applicant processing.  For example, make sure the SAT score is not greater than the maximum possible score, and so on.

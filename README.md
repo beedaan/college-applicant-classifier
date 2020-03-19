@@ -4,7 +4,7 @@
 
 This project was a Software Engineering Candidate Project for Apex Systems.  It was built using TDD to write out the test cases first, then the business logic to make the tests pass.
 
-*Description:* A local college here in California wants to save money by partially automating its applicant review process. In short:
+**Description:** A local college here in California wants to save money by partially automating its applicant review process. In short:
 
 * Some applicants can be accepted without further review by admissions staff ("instant accept").
 * Other applicants can be safely rejected without further review by admissions staff ("instant

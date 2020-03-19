@@ -22,6 +22,32 @@ public class ApplicantService {
     private ApplicantValidator applicantValidator = new ApplicantValidator();
     private ApplicantRepository applicantRepository = new DummyApplicantRepositoryImpl();
 
+    /**
+     * Processes the college {@link Applicant} according to the following rules:
+     * <ul>
+     *  <li>To qualify as instant accept, all of the following criteria must be met.
+     *  <ul>
+     *     <li>In-state (California) age 17 or older, and younger than 26; or older than 80 from any state.
+     *     <li>High School GPA of 90% or higher of scale provided in their application. For example, 3.6 on a 4.0 scale; or 4.5 on a 5.0 scale.
+     *     <li>SAT score greater than 1920 or ACT score greater than 27. Note: Both, or only one of these, may be present in the applicant.
+     *     <li>No "instant reject” criteria is hit (see below).
+     *  </ul>
+     *  <li>All applicants can be subject to instant reject, if they meet any of the following criteria. Some of the criteria is dubious, admittedly, but the Dean insisted on it.
+     *  <ul>
+     *     <li>1 or more felonies over the past 5 years.
+     *     <li>High School GPA below 70% of scale provided on application. For example, 2.8 on a 4.0
+     *     scale.
+     *     <li>The applicant claimed to be a negative age (it happens!) e.g. "-20” years old.
+     *     <li>The applicant’s first and/or last name are not in the form of first letter capitalized, the
+     *     rest lower case.
+     *  </ul>
+     * <li>If the candidate does not qualify for instant accept nor qualifies for instant reject, then they
+     *     should be flagged for further review instead.
+     * </ul>
+     *
+     * @param applicant the college applicant, and all of their application information
+     * @return the applicant status, not null
+     */
     public ApplicantStatus processApplicant(Applicant applicant) {
         applicantValidator.validate(applicant);
 

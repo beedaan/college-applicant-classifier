@@ -17,7 +17,7 @@ reject").
 * To qualify as instant accept, all of the following criteria must be met.
     * In-state (California) age 17 or older, and younger than 26; or older than 80 from any state.
     * High School GPA of 90% or higher of scale provided in their application. For example, 3.6 on a 4.0 scale; or 4.5 on a 5.0 scale.
-    *SAT score greater than 1920 or ACT score greater than 27. Note: Both, or only one of these, may be present in the applicant.
+    * SAT score greater than 1920 or ACT score greater than 27. Note: Both, or only one of these, may be present in the applicant.
     * No "instant reject” criteria is hit (see below).
    
 * All applicants can be subject to instant reject, if they meet any of the following criteria. Some of
